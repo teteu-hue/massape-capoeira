@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Menu Fullscreen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..700&family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#fafafa;
+    --ink:#141414;
+    --muted:#bdbdbd;
+    --panel:#e9e7e3;
+    --line:rgba(20,20,20,.12);
+    --ease:cubic-bezier(.76,0,.24,1);
+    --display:'Instrument Serif',Georgia,serif;
+    --sans:'Manrope',-apple-system,'Segoe UI',system-ui,sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    font-family:var(--sans);
+    background:var(--bg);
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+    letter-spacing:-.01em;
+    overflow-x:hidden;
+  }
+
+  /* ---------- HEADER / TRIGGER (botão à esquerda, branco sobre a imagem) ---------- */
+  .top{
+    position:fixed;inset:0 0 auto 0;z-index:20;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:26px 40px;color:#fff;
+    text-shadow:0 1px 20px rgba(0,0,0,.35);
+  }
+  .menu-btn{
+    display:flex;align-items:center;gap:12px;
+    background:none;border:0;color:#fff;cursor:pointer;
+    font-family:var(--sans);font-size:14px;font-weight:500;letter-spacing:.02em;
+    text-shadow:0 1px 20px rgba(0,0,0,.35);
+  }
+  .menu-btn .bars{display:inline-flex;flex-direction:column;gap:4px}
+  .menu-btn .bars span{width:22px;height:1.5px;background:currentColor;transition:.4s var(--ease)}
+  .menu-btn:hover .bars span:first-child{transform:translateX(4px)}
+  .brand{font-family:var(--display);font-size:24px;letter-spacing:0;line-height:1}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    position:relative;min-height:100vh;
+    display:flex;flex-direction:column;justify-content:flex-end;
+    padding:40px;color:#fff;overflow:hidden;
+  }
+  .hero__bg{
+    position:absolute;inset:-6%;z-index:0;
+    background:url('https://picsum.photos/seed/produtora9/1920/1200') center/cover no-repeat;
+    transform:scale(1.06);
+    transition:transform .6s cubic-bezier(.22,1,.36,1);
+    will-change:transform;
+  }
+  .hero::after{
+    content:"";position:absolute;inset:0;z-index:1;
+    background:linear-gradient(180deg,rgba(0,0,0,.2),rgba(0,0,0,.5));
+  }
+  .hero__inner{position:relative;z-index:2}
+  .hero h1{
+    font-family:var(--display);font-weight:400;
+    font-size:clamp(52px,11vw,168px);line-height:.92;letter-spacing:-.01em;
+    max-width:16ch;text-shadow:0 2px 40px rgba(0,0,0,.3);
+  }
+  .hero h1 em{font-style:italic}
+  .hero p{margin-top:22px;max-width:42ch;opacity:.9;font-size:16px;line-height:1.5}
+
+  /* ---------- BACKDROP (escurece os 40% restantes) ---------- */
+  .menu-backdrop{
+    position:fixed;inset:0;z-index:29;
+    background:rgba(10,10,10,.45);
+    opacity:0;visibility:hidden;
+    transition:opacity .6s var(--ease),visibility .6s var(--ease);
+  }
+  .menu-backdrop.open{opacity:1;visibility:visible}
+
+  /* ---------- PAINEL DO MENU (60% da tela, desliza da esquerda) ---------- */
+  .menu{
+    position:fixed;top:0;left:0;height:100%;
+    width:60vw;z-index:30;
+    background:var(--bg);
+    display:grid;grid-template-columns:1fr 1fr;   /* nav | imagem */
+    transform:translateX(-100%);
+    transition:transform .85s var(--ease);
+    box-shadow:0 0 90px rgba(0,0,0,.22);
+  }
+  .menu.open{transform:translateX(0)}
+
+  /* coluna esquerda: nav */
+  .menu__nav{
+    position:relative;display:flex;flex-direction:column;justify-content:center;
+    padding:80px 52px;
+  }
+  .nav-list{list-style:none;display:flex;flex-direction:column;gap:2px}
+  .nav-item{overflow:hidden}
+  .nav-link{
+    --i:0;
+    display:flex;align-items:center;gap:16px;
+    text-decoration:none;color:var(--muted);
+    font-size:clamp(28px,2.9vw,46px);font-weight:500;line-height:1.16;
+    letter-spacing:-.03em;
+    transition:color .5s var(--ease);
+    transform:translateY(110%);opacity:0;
+  }
+  .menu.open .nav-link{
+    transform:translateY(0);opacity:1;
+    transition:transform .9s var(--ease) calc(.25s + var(--i)*.06s),
+               opacity  .9s var(--ease) calc(.25s + var(--i)*.06s),
+               color .5s var(--ease);
+  }
+  .nav-link:hover{color:var(--ink)}
+  .nav-link .arrow{
+    display:inline-block;width:0;overflow:hidden;
+    opacity:0;transform:translateX(-14px);
+    transition:.5s var(--ease);font-weight:400;
+  }
+  .nav-link:hover .arrow{width:.9em;opacity:1;transform:translateX(0)}
+
+  .roll{position:relative;display:inline-block;overflow:hidden;vertical-align:top}
+  .roll span{display:block;transition:transform .55s var(--ease)}
+  .roll span+span{position:absolute;top:100%;left:0}
+  .nav-link:hover .roll span{transform:translateY(-100%)}
+
+  .menu__foot{
+    position:absolute;left:52px;right:52px;bottom:40px;
+    display:flex;justify-content:space-between;align-items:flex-end;
+    font-size:13px;color:#777;letter-spacing:.02em;gap:20px;
+  }
+  .menu__foot .label{font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:#aaa;margin-bottom:8px}
+  .menu__foot a{color:var(--ink);text-decoration:none}
+  .menu__foot a:hover{text-decoration:underline}
+  .socials{display:flex;gap:18px}
+
+  /* coluna direita: imagem estática ocupando tudo */
+  .menu__image{position:relative;overflow:hidden;background:#ddd}
+  .menu__image img{width:100%;height:100%;object-fit:cover;display:block}
+  .media-cap{
+    position:absolute;left:22px;bottom:22px;color:#fff;
+    font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+    text-shadow:0 1px 14px rgba(0,0,0,.5);
+  }
+
+  /* close */
+  .close-btn{
+    position:absolute;top:26px;right:26px;z-index:5;
+    display:flex;align-items:center;gap:10px;
+    background:none;border:0;cursor:pointer;color:#fff;
+    font-family:var(--sans);font-size:13px;font-weight:500;letter-spacing:.02em;
+    text-shadow:0 1px 14px rgba(0,0,0,.5);
+  }
+  .close-btn .x{position:relative;width:16px;height:16px}
+  .close-btn .x::before,.close-btn .x::after{
+    content:"";position:absolute;top:50%;left:0;width:100%;height:1.5px;background:currentColor;
+    transition:.4s var(--ease);
+  }
+  .close-btn .x::before{transform:rotate(45deg)}
+  .close-btn .x::after{transform:rotate(-45deg)}
+  .close-btn:hover .x::before{transform:rotate(135deg)}
+  .close-btn:hover .x::after{transform:rotate(45deg)}
+
+  body.menu-open{overflow:hidden}
+
+  @media (max-width:900px){
+    .menu{width:100vw;grid-template-columns:1fr}
+    .menu__image{display:none}
+    .menu__nav{padding:110px 32px 32px}
+    .menu__foot{left:32px;right:32px}
+    .close-btn{color:var(--ink);text-shadow:none}
+    .top{padding:20px 24px}
+    .hero{padding:24px}
+  }
+</style>
+</head>
+<body>
+
+  <header class="top">
+    <button class="menu-btn" id="openMenu">
+      <span class="bars"><span></span><span></span></span>
+      Menu
+    </button>
+    <span class="brand">Maré</span>
+  </header>
+
+  <section class="hero" id="hero">
+    <div class="hero__bg" id="heroBg"></div>
+    <div class="hero__inner">
+      <h1>We craft <em>stories</em><br>for change.</h1>
+      <p>Clique em “Menu” no canto superior esquerdo pra abrir o painel.</p>
+    </div>
+  </section>
+
+  <!-- backdrop -->
+  <div class="menu-backdrop" id="backdrop"></div>
+
+  <!-- PAINEL (60% da tela) -->
+  <nav class="menu" id="menu" aria-hidden="true">
+    <button class="close-btn" id="closeMenu"><span class="x"></span>Close</button>
+
+    <div class="menu__nav">
+      <ul class="nav-list">
+        <li class="nav-item"><a class="nav-link" href="#" style="--i:0"><span class="arrow">&rarr;</span><span class="roll"><span>Home</span><span>Home</span></span></a></li>
+        <li class="nav-item"><a class="nav-link" href="#" style="--i:1"><span class="arrow">&rarr;</span><span class="roll"><span>About</span><span>About</span></span></a></li>
+        <li class="nav-item"><a class="nav-link" href="#" style="--i:2"><span class="arrow">&rarr;</span><span class="roll"><span>Team</span><span>Team</span></span></a></li>
+        <li class="nav-item"><a class="nav-link" href="#" style="--i:3"><span class="arrow">&rarr;</span><span class="roll"><span>Services</span><span>Services</span></span></a></li>
+        <li class="nav-item"><a class="nav-link" href="#" style="--i:4"><span class="arrow">&rarr;</span><span class="roll"><span>Cases</span><span>Cases</span></span></a></li>
+        <li class="nav-item"><a class="nav-link" href="#" style="--i:5"><span class="arrow">&rarr;</span><span class="roll"><span>Blog</span><span>Blog</span></span></a></li>
+        <li class="nav-item"><a class="nav-link" href="#" style="--i:6"><span class="arrow">&rarr;</span><span class="roll"><span>Contact</span><span>Contact</span></span></a></li>
+      </ul>
+
+      <div class="menu__foot">
+        <div>
+          <div class="label">Contact</div>
+          <a href="mailto:info@produtora.com">info@produtora.com</a><br>
+          <a href="tel:+5599999999999">+55 99 99999-9999</a>
+        </div>
+        <div class="socials">
+          <a href="#">Instagram</a>
+          <a href="#">Vimeo</a>
+          <a href="#">LinkedIn</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- imagem estática ocupando toda a parte direita -->
+    <div class="menu__image">
+      <img src="https://picsum.photos/seed/prod-menu/1200/1600" alt="">
+      <span class="media-cap">Selected work</span>
+    </div>
+  </nav>
+
+<script>
+  const menu = document.getElementById('menu');
+  const backdrop = document.getElementById('backdrop');
+  const body = document.body;
+  const openBtn = document.getElementById('openMenu');
+  const closeBtn = document.getElementById('closeMenu');
+
+  function open(){
+    menu.classList.add('open'); backdrop.classList.add('open');
+    menu.setAttribute('aria-hidden','false'); body.classList.add('menu-open');
+  }
+  function close(){
+    menu.classList.remove('open'); backdrop.classList.remove('open');
+    menu.setAttribute('aria-hidden','true'); body.classList.remove('menu-open');
+  }
+  openBtn.addEventListener('click', open);
+  closeBtn.addEventListener('click', close);
+  backdrop.addEventListener('click', close);
+  document.addEventListener('keydown', e => { if(e.key === 'Escape') close(); });
+
+  /* parallax da imagem do hero */
+  const heroBg = document.getElementById('heroBg');
+  const hero = document.getElementById('hero');
+  hero.addEventListener('mousemove', e => {
+    const r = hero.getBoundingClientRect();
+    const px = (e.clientX / r.width - .5);
+    const py = (e.clientY / r.height - .5);
+    heroBg.style.transform = `scale(1.06) translate(${px * -26}px, ${py * -26}px)`;
+  });
+  hero.addEventListener('mouseleave', () => {
+    heroBg.style.transform = 'scale(1.06) translate(0,0)';
+  });
+</script>
+</body>
+</html>
