@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contato — Massapê Capoeira</title>
+<meta name="description" content="Fale com o Grupo Massapê Capoeira. Agende uma aula experimental gratuita e venha jogar na nossa roda.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..700&family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<script defer src="assets/menu.js"></script>
+</head>
+<body>
+  <main>
+    <header class="page-head">
+      <span class="kicker">Contato</span>
+      <h1>Venha fazer sua primeira roda.</h1>
+      <p class="lead">A primeira aula é experimental e gratuita. Fale com a gente para conhecer os horários das turmas e dar o seu primeiro passo na capoeira.</p>
+    </header>
+
+    <section class="section">
+      <div class="contact-grid">
+        <div>
+          <div class="contact-block">
+            <div class="label">E-mail</div>
+            <a href="mailto:contato@massapecapoeira.com.br">contato@massapecapoeira.com.br</a>
+          </div>
+          <div class="contact-block">
+            <div class="label">Telefone / WhatsApp</div>
+            <a href="tel:+5585999999999">+55 85 99999-9999</a>
+          </div>
+          <div class="contact-block">
+            <div class="label">Academia</div>
+            <a href="#">Rua da Ginga, 100 — Fortaleza, CE</a>
+          </div>
+        </div>
+
+        <form class="form" onsubmit="event.preventDefault(); this.reset(); alert('Mensagem enviada! Em breve entraremos em contato. (Formulário de demonstração — sem envio real.)');">
+          <input type="text" placeholder="Seu nome" required>
+          <input type="email" placeholder="Seu e-mail" required>
+          <textarea placeholder="Conte pra gente: qual turma te interessa?" required></textarea>
+          <button class="btn" type="submit">Enviar mensagem &rarr;</button>
+        </form>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
